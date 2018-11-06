@@ -119,6 +119,7 @@ async function drawPostDetail(postId) {
   const backEl = frag.querySelector(".back");
   const commentListEl = frag.querySelector(".comment-list");
   const commentFormEl = frag.querySelector(".comment-form")
+  const updateEl = frag.querySelector(".update");
 
   // 3. 필요한 데이터 불러오기
   const {
@@ -130,7 +131,7 @@ async function drawPostDetail(postId) {
     }
   });
   const params = new URLSearchParams()
-  comments.forEach( c =>{
+  comments.forEach( c => {
     params.append('id',c.userId)
   })
 
@@ -174,10 +175,13 @@ async function drawPostDetail(postId) {
   }
 
   // 5. 이벤트 리스너 등록하기
-
   backEl.addEventListener("click", e => {
     drawPostList();
   });
+
+  updateEl.addEventListener('click', e => {
+    drawEditPostForm(postId)
+  })
 
   // 6. 템플릿을 문서에 삽입
   rootEl.textContent = ""; // 다시 다 지우고 다시 그려라
@@ -214,11 +218,40 @@ async function drawNewPostForm() {
 
 async function drawEditPostForm(postId) {
   // 1. 템플릿 복사
+  const frag = document.importNode(templates.postForm, true)
+
   // 2. 요소 선택
+  const formEl = frag.querySelector('.post-form')
+  const backEl = frag.querySelector(".back");
+  const titleEl = frag.querySelector('.title')
+  const bodyEl = frag.querySelector('.body')
+
   // 3. 필요한 데이터 불러오기
+  const {data: {title, body}} = await api.get('/posts/' +postId)
+
   // 4. 내용 채우기
+  titleEl.value = title
+  bodyEl.value = body
+
   // 5. 이벤트 리스너 등록하기
+  formEl.addEventListener('submit', async e => {
+    e.preventDefault();
+    const title = e.target.elements.title.value
+    const body = e.target.elements.body.value
+    await api.patch('/posts/' + postId, {
+      title,
+      body
+    })
+    drawPostList()
+  })
+  backEl.addEventListener('click', e => {
+    e.preventDefault()
+    drawPostList()
+  })
+
   // 6. 템플릿을 문서에 삽입
+  rootEl.textContent = ''
+  rootEl.appendChild(frag)
 }
 
 // 페이지 로드 시 그릴 화면 설정
