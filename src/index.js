@@ -122,6 +122,14 @@ async function drawPostDetail(postId) {
       _embad: "comments"
     }
   });
+  const params = new URLSearchParams()
+  comments.forEach( c=>{
+    params.append('id',c.userId)
+  })
+
+  const {data: userList} = await api.get('/users',{
+    params
+  })
 
   // 4. 내용 채우기
   titleEl.textContent = title;
@@ -129,7 +137,7 @@ async function drawPostDetail(postId) {
   authorEl.textContent = user.username;
 
   // 댓글 표시
-  for (const commentsItem of comments) {
+  for (const commentItem of comments) {
     // 1. 템플릿 복사
     const frag = document.importNode(templates.commentItem, true)
 
@@ -139,9 +147,11 @@ async function drawPostDetail(postId) {
     const deleteEl = frag.querySelector('.delete')
 
     // 3. 필요한 데이터 불러오기
-    // 4. 내용 채우기
-    bodyEl.textContent = commentsItem.body
 
+    // 4. 내용 채우기
+    bodyEl.textContent = commentItem.body
+    const user = userList.find(item => item.id === commentItem.userId)
+    authorEl.textContent = user.username
     // 5. 이벤트 리스너 등록하기
     // 6. 템플릿을 문서에 삽입
     commentListEl.appendChild(frag)
