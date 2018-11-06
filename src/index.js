@@ -71,6 +71,8 @@ async function drawPostList() {
 
   // 2. 요소 선택
   const listEl = frag.querySelector(".post-list");
+  const createEl = frag.querySelector('.create')
+
   // 3. 필요한 데이터 불러오기
   // data 속성에 postList에 저장
   // const res  = await api.get("/posts?_embad=user");
@@ -95,7 +97,11 @@ async function drawPostList() {
 
     listEl.appendChild(frag);
   }
+
   // 5. 이벤트 리스너 등록하기
+  createEl.addEventListener('click',e => {
+    drawNewPostForm()
+  })
 
   // 6. 템플릿을 문서에 삽입
   rootEl.textContent = "";
@@ -180,11 +186,25 @@ async function drawPostDetail(postId) {
 
 async function drawNewPostForm() {
   // 1. 템플릿 복사
+  const frag = document.importNode(templates.postForm, true)
   // 2. 요소 선택
+  const formEl = frag.querySelector('.post-form')
   // 3. 필요한 데이터 불러오기
   // 4. 내용 채우기
   // 5. 이벤트 리스너 등록하기
+  formEl.addEventListener('submit',async e => {
+    e.preventDefault();
+    const title = e.target.elements.title.value
+    const body = e.target.elements.body.value
+    await api.post('/posts', {
+      title,
+      body
+    })
+    drawPostList()
+  })
   // 6. 템플릿을 문서에 삽입
+  rootEl.textContent = ''
+  rootEl.appendChild(frag)
 }
 
 async function drawEditPostForm(postId) {
