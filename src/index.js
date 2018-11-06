@@ -189,6 +189,7 @@ async function drawNewPostForm() {
   const frag = document.importNode(templates.postForm, true)
   // 2. 요소 선택
   const formEl = frag.querySelector('.post-form')
+  const backEl = frag.querySelector(".back");
   // 3. 필요한 데이터 불러오기
   // 4. 내용 채우기
   // 5. 이벤트 리스너 등록하기
@@ -200,6 +201,10 @@ async function drawNewPostForm() {
       title,
       body
     })
+    drawPostList()
+  })
+  backEl.addEventListener('click', e => {
+    e.preventDefault()
     drawPostList()
   })
   // 6. 템플릿을 문서에 삽입
